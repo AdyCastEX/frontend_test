@@ -9,11 +9,11 @@
     font-weight: 600;
   }
 
-  > .field {
+  > .fields {
     display: flex;
   }
 
-  > .field + .company {
+  > .fields + .company {
     margin-top: 24px;
   }
 
@@ -21,15 +21,15 @@
     margin-top: 24px;
   }
 
-  > .name + .field {
+  > .name + .fields {
     margin-top: 16px;
   }
 
-  > .field > .icon {
+  > .fields > .icon {
     flex: 0 0 16px;
   }
 
-  > .field > .value {
+  > .fields > .value {
     color: #7a869a;
   }
 
@@ -42,7 +42,7 @@
     font-style: italic;
   }
 
-  > .field > .icon + .value {
+  > .fields > .icon + .value {
     margin-left: 8px;
   }
 }
