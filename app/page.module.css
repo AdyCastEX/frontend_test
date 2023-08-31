@@ -209,6 +209,21 @@
   .grid {
     grid-template-columns: repeat(2, 50%);
   }
+  .main {
+    padding: 2rem;
+  }
+}
+  
+@media screen and (max-width: 768px) {
+  .main {
+    padding: 2rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .main {
+    padding: 2rem;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
