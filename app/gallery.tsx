@@ -12,7 +12,7 @@ import {
 import Controls from "./controls";
 import Modal from "./modal";
 
-import { User } from "./types/user";
+import { Company, User } from "./types/user";
 
 export type GalleryProps = {
   users: User[];
@@ -35,15 +35,65 @@ const Gallery = ({ users }: GalleryProps) => {
     setSelectedUser(null);
     setIsModalOpen(false);
   };
+  
+  type Field = keyof User;
+  type Direction = "ascending" | "descending";
+  
+  const [sortField, setSortField] = useState<keyof User>('name')
+  const handleSortField = (val: keyof User) => {
+    setSortField(val)
+  }
+  const [sortDirection, setSortDirection] = useState<Direction>('ascending')
+  const handleSortDirection = (val: Direction) => {
+    setSortDirection(val)
+  }
+
+  const sortUsers = (
+    users: User[],
+    field: Field,
+    direction: Direction
+  ): User[] => {
+    const sortedUsers = [...users].sort((userA, userB) => {
+      let valueA: string | number = "";
+      let valueB: string | number = "";
+  
+      if (field === "company") {
+        valueA = userA[field].name.toLowerCase();
+        valueB = userB[field].name.toLowerCase();
+      } else if (field === "address") {
+        valueA = userA[field].city.toLowerCase();
+        valueB = userB[field].city.toLowerCase();
+      } else {
+        valueA = userA[field];
+        valueB = userB[field];
+      }
+  
+      if (valueA === valueB) {
+        return 0;
+      }
+  
+      if (direction === "ascending") {
+        return valueA < valueB ? -1 : 1;
+      } else {
+        return valueB < valueA ? -1 : 1;
+      }
+    });
+  
+    return sortedUsers;
+  };
+  
 
   return (
     <div className="user-gallery">
       <div className="heading">
         <h1 className="title">Users</h1>
-        <Controls />
+        <Controls
+          handleSortField={handleSortField}
+          handleSortDirection={handleSortDirection}
+        />
       </div>
       <div className="items">
-        {usersList.map((user, index) => (
+        {sortUsers(users, sortField, sortDirection).map((user, index) => (
           <div
             className="item user-card"
             key={index}
