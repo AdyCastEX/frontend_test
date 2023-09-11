@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Avatar from "boring-avatars";
 import {
   FaRegCircleXmark,
@@ -8,6 +8,8 @@ import {
   FaPhone,
   FaEnvelope,
 } from "react-icons/fa6";
+
+import axios from "axios"
 
 import Modal from "./modal";
 
@@ -17,9 +19,13 @@ export type GalleryProps = {
   users: User[];
 };
 const Gallery = ({ users }: GalleryProps) => {
-  const [usersList, setUsersList] = useState(users);
+  const [usersList, setUsersList] = useState([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleModalOpen = (id: number) => {
     const user = usersList.find((item) => item.id === id) || null;
@@ -35,11 +41,34 @@ const Gallery = ({ users }: GalleryProps) => {
     setIsModalOpen(false);
   };
 
+  const getUserList = async () => {
+    setLoading(true);
+    await axios.get('https://jsonplaceholder.typicode.com/users')
+    .then(function (response) {
+      setUsersList(response.data)
+      setError(false);
+      setLoading(false);
+    })
+    .catch(function (error) {
+      setErrorMsg(error)
+      setError(true);
+      setLoading(false);
+    });
+  }
+ 
+
+  useEffect(() => {
+    getUserList()
+  }, [])
+
   return (
     <div className="user-gallery">
       <h1 className="heading">Users</h1>
       <div className="items">
-        {usersList.map((user, index) => (
+      {
+        loading || error 
+        ? <h1>{errorMsg}</h1> 
+        : usersList.map((user, index) => (
           <div
             className="item user-card"
             key={index}
@@ -58,7 +87,8 @@ const Gallery = ({ users }: GalleryProps) => {
               <div className="company">{user.company.name}</div>
             </div>
           </div>
-        ))}
+        ))
+      }
         <Modal isOpen={isModalOpen} onClose={handleModalClose}>
           <div className="user-panel">
             <div className="header">
