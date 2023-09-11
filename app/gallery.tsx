@@ -22,6 +22,9 @@ const Gallery = ({ users }: GalleryProps) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [selectedSortFieldName, setSelectedSortFieldName] = useState(null);
+  const [selectedSortOrientation, setSelectedSortOrientation] = useState(null);
+
   const handleModalOpen = (id: number) => {
     const user = usersList.find((item) => item.id === id) || null;
 
@@ -34,16 +37,54 @@ const Gallery = ({ users }: GalleryProps) => {
   const handleModalClose = () => {
     setSelectedUser(null);
     setIsModalOpen(false);
+  }; 
+
+  const handleSortFieldName = (filter: any) => {
+    setSelectedSortFieldName(filter.value)
+  }
+
+  const handleSortOrientation = (filter: any) => {
+    setSelectedSortOrientation(filter.value)
+  }
+
+  const sortUsers = () => {
+    const sortedUsers = [...usersList].sort((userA, userB) => {
+      let valueA: string | number = "";
+      let valueB: string | number = "";
+
+      if (selectedSortFieldName === "company") {
+        valueA = userA[selectedSortFieldName].name.toLowerCase();
+        valueB = userB[selectedSortFieldName].name.toLowerCase();
+      } else if (selectedSortFieldName === "address") {
+        valueA = userA[selectedSortFieldName].city.toLowerCase();
+        valueB = userB[selectedSortFieldName].city.toLowerCase();
+      } else {
+        valueA = userA[selectedSortFieldName];
+        valueB = userB[selectedSortFieldName];
+      }
+
+      if (valueA === valueB) {
+        return 0;
+      }
+
+      if (selectedSortOrientation === "ascending") {
+        return valueA < valueB ? -1 : 1;
+      } else {
+        return valueB < valueA ? -1 : 1;
+      }
+    });
+
+    return sortedUsers;
   };
 
   return (
     <div className="user-gallery">
       <div className="heading">
         <h1 className="title">Users</h1>
-        <Controls />
+        <Controls handleSortFieldName={handleSortFieldName} handleSortOrientation={handleSortOrientation}/>
       </div>
       <div className="items">
-        {usersList.map((user, index) => (
+        {sortUsers(usersList).map((user, index) => (
           <div
             className="item user-card"
             key={index}
