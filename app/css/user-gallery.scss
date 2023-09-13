@@ -7,7 +7,13 @@
     grid-template-rows: auto;
     grid-gap: 16px;
 
+    @media screen and (min-width: 701px) and (max-width: 1120px) {
+      // for tablet
+      grid-template-columns: repeat(2, 1fr);
+    }
+
     @media screen and (max-width: 480px) {
+      // for mobile
       grid-template-columns: 1fr;
     }
   }
