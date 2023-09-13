@@ -1,46 +1,94 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import Avatar from "boring-avatars";
+import { useState, useEffect } from "react"
+import Avatar from "boring-avatars"
 import {
   FaRegCircleXmark,
   FaLocationDot,
   FaPhone,
   FaEnvelope,
-} from "react-icons/fa6";
+} from "react-icons/fa6"
 
-import Controls from "./controls";
-import Modal from "./modal";
+import Controls from "./controls"
+import Modal from "./modal"
 
-import { User } from "./types/user";
+import { User } from "./types/user"
 
 export type GalleryProps = {
-  users: User[];
-};
+  users: User[]
+}
 const Gallery = ({ users }: GalleryProps) => {
-  const [usersList, setUsersList] = useState(users);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [usersList, setUsersList] = useState(users)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  //State Variable for sorting
+  const [sortingField, setSortingField] = useState<string>("name") // default to name
+  const [sortingDirection, setSortingDirection] = useState<string>("ascending") //default to ascending
+
+  //function to sort userList
+  const sortUsers = () => {
+    const sortedUsers = [...usersList]
+
+    sortedUsers.sort((a, b) => {
+      const aValue = getField(a, sortingField)
+      const bValue = getField(b, sortingField)
+
+      if (sortingDirection === "ascending") {
+        if (aValue < bValue) return -1
+        if (aValue > bValue) return 1
+        return 0
+      } else {
+        if (aValue > bValue) return -1
+        if (aValue < bValue) return 1
+        return 0
+      }
+    })
+
+    setUsersList(sortedUsers)
+  }
+
+  // Function to get nested field values(company)
+  const getField = (object, field) => {
+    const keys = field.split(".")
+    let value = object
+
+    for (const key of keys) {
+      value = value[key]
+    }
+
+    return value
+  }
+  //call the sortUsers func everytime sorting opt change
+
+  useEffect(() => {
+    sortUsers()
+  }, [sortingField, sortingDirection])
 
   const handleModalOpen = (id: number) => {
-    const user = usersList.find((item) => item.id === id) || null;
+    const user = usersList.find((item) => item.id === id) || null
 
     if (user) {
-      setSelectedUser(user);
-      setIsModalOpen(true);
+      setSelectedUser(user)
+      setIsModalOpen(true)
     }
-  };
+  }
 
   const handleModalClose = () => {
-    setSelectedUser(null);
-    setIsModalOpen(false);
-  };
+    setSelectedUser(null)
+    setIsModalOpen(false)
+  }
+
+  const handleSortingChange = (field: string, direction: string) => {
+    setSortingField(field)
+    setSortingDirection(direction)
+  }
 
   return (
     <div className="user-gallery">
       <div className="heading">
         <h1 className="title">Users</h1>
-        <Controls />
+        <Controls onSortingChange={handleSortingChange} />
       </div>
       <div className="items">
         {usersList.map((user, index) => (
@@ -120,7 +168,7 @@ const Gallery = ({ users }: GalleryProps) => {
         </Modal>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Gallery;
+export default Gallery
