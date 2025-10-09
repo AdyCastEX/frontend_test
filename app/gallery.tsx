@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Avatar from "boring-avatars";
 import {
   FaRegCircleXmark,
@@ -10,21 +10,35 @@ import {
 } from "react-icons/fa6";
 
 import Modal from "./modal";
-
 import { User } from "./types/user";
 
-export type GalleryProps = {
-  users: User[];
-};
-const Gallery = ({ users }: GalleryProps) => {
-  const [usersList, setUsersList] = useState(users);
+const Gallery = () => {
+  const [usersList, setUsersList] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch("https://jsonplaceholder.typicode.com/users");
+        if (!res.ok) throw new Error("Failed to fetch users");
+        const data = await res.json();
+        setUsersList(data);
+      } catch (err: any) {
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const handleModalOpen = (id: number) => {
     const user = usersList.find((item) => item.id === id) || null;
-
-    if(user) {
+    if (user) {
       setSelectedUser(user);
       setIsModalOpen(true);
     }
@@ -34,6 +48,9 @@ const Gallery = ({ users }: GalleryProps) => {
     setSelectedUser(null);
     setIsModalOpen(false);
   };
+
+  if (loading) return <p>Loading users...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="user-gallery">
@@ -59,6 +76,7 @@ const Gallery = ({ users }: GalleryProps) => {
             </div>
           </div>
         ))}
+
         <Modal isOpen={isModalOpen} onClose={handleModalClose}>
           <div className="user-panel">
             <div className="header">
@@ -99,7 +117,7 @@ const Gallery = ({ users }: GalleryProps) => {
                     <FaPhone className="icon" />
                     <div className="value">{selectedUser.phone}</div>
                   </div>
-                  <div className="fields">
+                  <div className="field">
                     <FaEnvelope className="icon" />
                     <div className="value">{selectedUser.email}</div>
                   </div>
