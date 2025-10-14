@@ -4,7 +4,7 @@ import { User } from "./types/user";
 
 export default async function Home() {
   // Fetch user data from the API
-  const res = await fetch("https://jsonplaceholder.typicode.com/users", {
+  const res = await fetch("https://datausers-api.onrender.com/api/users", {
     cache: "no-store", // ensures fresh data each time (optional)
   });
 
