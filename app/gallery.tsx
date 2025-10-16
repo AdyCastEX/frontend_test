@@ -12,17 +12,25 @@ import {
 import Modal from "./modal";
 
 import { User } from "./types/user";
+import { useQuery } from "@tanstack/react-query";
+import { getUsers } from "./api/getUsers";
 
 export type GalleryProps = {
   users: User[];
 };
-const Gallery = ({ users }: GalleryProps) => {
-  const [usersList, setUsersList] = useState(users);
+const Gallery = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const { data: users = [], isPending, isError } = useQuery<User[]>({
+    queryKey: ["users"],
+    queryFn: getUsers
+  });
+
+  console.log("Users fetched from API:", users);
+
   const handleModalOpen = (id: number) => {
-    const user = usersList.find((item) => item.id === id) || null;
+    const user = users.find((item) => item.id === id) || null;
 
     if(user) {
       setSelectedUser(user);
@@ -35,11 +43,14 @@ const Gallery = ({ users }: GalleryProps) => {
     setIsModalOpen(false);
   };
 
+  if (isPending) return <div>Loading...</div>;
+  if (isError) return <div>Error loading users.</div>;
+
   return (
     <div className="user-gallery">
       <h1 className="heading">Users</h1>
       <div className="items">
-        {usersList.map((user, index) => (
+        {users.map((user, index) => (
           <div
             className="item user-card"
             key={index}
