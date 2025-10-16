@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Avatar from "boring-avatars";
 import {
   FaRegCircleXmark,
@@ -12,15 +12,20 @@ import {
 import Controls from "./controls";
 import Modal from "./modal";
 
-import { User } from "./types/user";
+import { SortDirection, SortField, User } from "./types/user";
 
 export type GalleryProps = {
   users: User[];
 };
+
+
 const Gallery = ({ users }: GalleryProps) => {
   const [usersList, setUsersList] = useState(users);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortBy, setSortBy] = useState<SortDirection>("asc");
 
   const handleModalOpen = (id: number) => {
     const user = usersList.find((item) => item.id === id) || null;
@@ -36,11 +41,50 @@ const Gallery = ({ users }: GalleryProps) => {
     setIsModalOpen(false);
   };
 
+  useEffect(() => {
+    console.log("🔍 Sorting triggered");
+    console.log("Sort Field:", sortField);
+    console.log("Sort Direction:", sortBy);
+
+    const sorted = [...users].sort((a, b) => {
+      let sortA: string;
+      let sortB: string;
+
+      switch (sortField) {
+        case "name":
+          sortA = a.name.toLowerCase();
+          sortB = b.name.toLowerCase();
+          break;
+        case "company":
+          sortA = a.company.name.toLowerCase();
+          sortB = b.company.name.toLowerCase();
+          break;
+        case "email":
+          sortA = a.email.toLowerCase();
+          sortB = b.email.toLowerCase();
+        break;
+        default:
+          sortA = "";
+          sortB = "";
+      }
+
+      if (sortA < sortB) return sortBy === "asc" ? -1 : 1;
+      if (sortA > sortB) return sortBy === "asc" ? 1 : -1;
+      return 0;
+    })
+
+    setUsersList(sorted);
+  }, [sortField, sortBy, users]);
+
   return (
     <div className="user-gallery">
       <div className="heading">
         <h1 className="title">Users</h1>
-        <Controls />
+          <Controls
+            onSortFieldChange={(field: SortField) => setSortField(field)}
+            onSortDirectionChange={(direction: SortDirection) => setSortBy(direction)
+            }
+          />
       </div>
       <div className="items">
         {usersList.map((user, index) => (

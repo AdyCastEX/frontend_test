@@ -27,3 +27,17 @@ export type Geo = {
   lat: string;
   lng: string;
 };
+
+export type SortField = "name" | "company" | "email";
+
+export type SortDirection = "asc" | "desc";
+
+export type FieldOption = {
+  label: string;
+  value: SortField;
+}
+
+export type DirectionOption = {
+  label: string;
+  value: SortDirection;
+}

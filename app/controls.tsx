@@ -1,14 +1,20 @@
 import Select from "react-select";
+import { SortField, SortDirection, FieldOption, DirectionOption } from "./types/user";
 
-const Controls = () => {
-  const fieldOptions = [
+type ControlsProps = {
+  onSortFieldChange: (value: SortField) => void;
+  onSortDirectionChange: (value: SortDirection) => void;
+};
+
+const Controls = ({ onSortFieldChange, onSortDirectionChange }: ControlsProps ) => {
+  const fieldOptions: FieldOption[] = [
     { label: "Name", value: "name" },
     { label: "Company", value: "company" },
     { label: "Email", value: "email" },
   ];
-  const directionOptions = [
-    { label: "Ascending", value: "ascending" },
-    { label: "Descending", value: "descending" },
+  const directionOptions: DirectionOption[] = [
+    { label: "Ascending", value: "asc" },
+    { label: "Descending", value: "desc" },
   ];
 
   return (
@@ -17,7 +23,13 @@ const Controls = () => {
         <label htmlFor="sort-field" className="label">
           Sort Field
         </label>
-        <Select options={fieldOptions} inputId="sort-field" className="input" />
+        <Select 
+          options={fieldOptions} 
+          inputId="sort-field" 
+          className="input" 
+          defaultValue={fieldOptions[0]}
+          onChange={(option) => onSortFieldChange(option?.value || "name")}
+        />
       </div>
       <div className="form-group group">
         <label htmlFor="sort-direction" className="label">
@@ -27,6 +39,8 @@ const Controls = () => {
           options={directionOptions}
           inputId="sort-direction"
           className="input"
+          defaultValue={directionOptions[0]}
+          onChange={(option) => onSortDirectionChange(option?.value || "asc")}
         />
       </div>
     </div>
